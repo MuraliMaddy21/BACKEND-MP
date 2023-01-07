@@ -16,7 +16,8 @@ app.use(bodyParser.json())
 
 var mainid;
 var password;
-
+var plantid;
+var plangrp;
 
 
 app.post('/mplogin',function(req,res) 
@@ -59,8 +60,8 @@ app.post('/mpworkorder',function(req,res)
 {
   var result2;
 
-  var plantid=req.body.plantid;
-  var plangrp=req.body.plangrp;
+   plantid=req.body.plantid;
+   plangrp=req.body.plangrp;
 
   console.log(plantid);
   console.log(plangrp);
@@ -90,13 +91,13 @@ request(options, function (error, response) {
 
 })
 
-app.get('/mpnotification',function(req,res)
+app.post('/mpnotification',function(req,res)
 {
   var result3;
-  var plantid=req.body.plantid;
-  var plangrp=req.body.plangrp;
-  var date = req.body.notidate;
-
+  var date = req.body.nodate;
+  console.log(date);
+  console.log(plantid);
+  console.log(plangrp);
   var request = require('request');
   var options = {
   'method': 'POST',
