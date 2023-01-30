@@ -16,8 +16,7 @@ app.use(bodyParser.json())
 
 var mainid;
 var password;
-var plantid;
-var plangrp;
+
 
 
 app.post('/mplogin',function(req,res) 
