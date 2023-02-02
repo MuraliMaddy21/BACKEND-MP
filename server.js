@@ -6,6 +6,12 @@ var cors = require("cors")
 const {response} = require('express')
 const app = express();
 const X2JS = require('x2js')
+require('dotenv').config();
+const accountSid = 'ACdbc551338855ad25fedecadf7207e3b2'; 
+const authToken = process.env.AUTH;
+const client = require('twilio')(accountSid, authToken); 
+const sgMail = require('@sendgrid/mail')
+sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 
 app.use(cors())
 
@@ -47,13 +53,72 @@ request(options, function (error, response) {
   var x2js = new X2JS();
   result1 = x2js.xml2js(response.body)
   result1 = JSON.stringify(result1)
-  res.send(result1);
-});
+  console.log(result1);
+  var status = response.body;
+  status = x2js.xml2js(status)
+  status=status['Envelope']['Body']['ZFM_LOGIN_MP_MD.Response']['E_FLAG']
+  console.log(status)
+  res.send(result1)
+  if(status == "S")
+  {
+    client.messages 
+      .create({ 
+         body: 'MAINTENANCE PORTAL-Login Attempt Made!Login Successful!',  
+         messagingServiceSid: 'MG3b1bb34d27f2176205c43dbd554b58e0',      
+         to: '+919150064160' 
+       }) 
+      .then(message => console.log(message.sid)) 
+      .done();
 
+      const msg = {
+        to: 'muraliramboo12@gmail.com', 
+        from: 'muralidharanportals@proton.me', 
+        subject: 'LOGIN ATTEMPT-Reg',
+        text: 'MAINTENANCE PORTAL-Login Attempt Made!Login Successful!',
+        html: '<strong>MAINTENANCE PORTAL-Login Attempt Made!Login Successful!</strong>',
+      }
+      sgMail
+        .send(msg)
+        .then(() => {
+          console.log('Email sent')
+        })
+        .catch((error) => {
+          console.error(error)
+        })
+      
+  }
+  else{
+    client.messages 
+      .create({ 
+         body: 'MAINTENANCE PORTAL-Login Attempt Made!Login Failure!Check Credentials',  
+         messagingServiceSid: 'MG3b1bb34d27f2176205c43dbd554b58e0',      
+         to: '+919150064160' 
+       }) 
+      .then(message => console.log(message.sid)) 
+      .done();
 
-     
+  const msg = {
+  to: 'muraliramboo12@gmail.com', 
+  from: 'muralidharanportals@proton.me', 
+  subject: 'LOGIN ATTEMPT-Reg',
+  text: 'MAINTENANCE PORTAL-Login Attempt Made!Login Failure!Check Credentials',
+  html: '<strong>MAINTENANCE PORTAL-Login Attempt Made!Login Failure!Check Credentials!</strong>',
+}
+sgMail
+  .send(msg)
+  .then(() => {
+    console.log('Email sent')
+  })
+  .catch((error) => {
+    console.error(error)
+  })
+
+  
+  }
+ 
+ });
+
 })
-
 
 app.get('/mpworkorder',function(req,res) 
 {
